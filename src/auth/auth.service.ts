@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as bcryptjs from 'bcryptjs';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -19,12 +20,16 @@ export class AuthService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const newUser = new this.userModel(createUserDto);
-      // TODO: 1. Encrypt the password
-      // TODO: 2. Save the user data
+      const { password, ...userData } = createUserDto;
+      const newUser = new this.userModel({
+        password: bcryptjs.hashSync(password, 10),
+        ...userData,
+      });
+      await newUser.save();
+      const { password: _, ...user } = newUser.toJSON();
+      // console.log(_);
+      return user;
       // TODO: 3. Generate the JWT
-
-      return await newUser.save();
     } catch (error) {
       // console.log(error.code);
 
