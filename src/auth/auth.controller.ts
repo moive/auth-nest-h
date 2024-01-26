@@ -47,7 +47,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('check-token')
   checkToken(@Request() req: Request): LoginResponse {
-    const user = req['user'] as User;
+    const user = req['user'];
     const token = this.authService.getJwtToken({ id: user._id });
     return {
       token,
